@@ -2,6 +2,7 @@ package com.zosh.treading.service;
 
 import com.zosh.treading.config.JwtProvider;
 import com.zosh.treading.domain.VerificationType;
+import com.zosh.treading.model.TwoFactorAuth;
 import com.zosh.treading.model.User;
 import com.zosh.treading.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +50,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User enableTwoFactorAuthentication(VerificationType verificationType, String sendTo, User user) {
-        return null;
+
+        TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
+        twoFactorAuth.setEnabled(true);
+        twoFactorAuth.setSendTo(verificationType);
+        user.setTwoFactorAuth(twoFactorAuth);
+
+        return userRepo.save(user);
     }
 
     @Override
     public User updatePassword(User user, String newPassword) {
-        return null;
+        if (user == null) {
+            throw new IllegalArgumentException("User is missing");
+        }
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("New password is missing");
+        }
+        user.setPassword(newPassword);
+        return userRepo.save(user);
     }
 }

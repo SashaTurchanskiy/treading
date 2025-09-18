@@ -107,7 +107,7 @@ public class AuthController {
         }
         return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
     }
-
+    @PostMapping("/verify-otp/{otp}")
     public ResponseEntity<AuthResponse> verifySigningOtp(@PathVariable String otp, @RequestParam String id){
         TwoFactorOTP twoFactorOTP = twoFactorOTPService.findById(id);
         if (twoFactorOTPService.verifyTwoFactorOTP(twoFactorOTP, otp)){
