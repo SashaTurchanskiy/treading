@@ -3,6 +3,9 @@ package com.zosh.treading.repository;
 import com.zosh.treading.model.ForgotPasswordToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ForgotPasswordRepo extends JpaRepository<ForgotPasswordToken, Long> {
-    ForgotPasswordToken findByUserId(Long userId);
+import java.util.Optional;
+
+public interface ForgotPasswordRepo extends JpaRepository<ForgotPasswordToken, String> {
+    Optional<ForgotPasswordToken> findByUserId(Long userId);
+    Optional<ForgotPasswordToken> findById(String id);
 }

@@ -15,21 +15,45 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
     @Override
     public ForgotPasswordToken createToken(User user, String id, String otp, VerificationType verificationType, String sendTo) {
-        return null;
+        ForgotPasswordToken token = new ForgotPasswordToken();
+        token.setId(id);
+        token.setUser(user);
+        token.setOtp(otp);
+        token.setVerificationType(verificationType);
+        token.setSendTo(sendTo);
+        return forgotPasswordRepo.save(token);
     }
 
     @Override
     public ForgotPasswordToken findById(String id) {
-        return null;
+        if (id == null){
+            throw new IllegalArgumentException("Token id cannot be null");
+        }
+        return forgotPasswordRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("Token not found"));
     }
 
     @Override
     public ForgotPasswordToken findByUserId(Long userId) {
-        return null;
+        if (userId == null){
+            throw new IllegalArgumentException("User id cannot be null");
+        }
+        return forgotPasswordRepo.findByUserId(userId).orElseThrow(()-> new IllegalArgumentException("Token not found"));
     }
 
     @Override
     public void deleteToken(ForgotPasswordToken token) {
-
-    }
+        if (token == null || token.getId() == null){
+            throw new IllegalArgumentException("Token or Token id cannot be null");
+        }
+        if (!forgotPasswordRepo.existsById(token.getId())){
+            throw new IllegalArgumentException("Token does not exist");
+        }
+        var existing = forgotPasswordRepo.findById(token.getId()).get();
+        if (token.getUser() != null && existing.getUser() !=null
+        && !existing.getUser().getId().equals(token.getUser().getId())){
+            throw new SecurityException("Not allowed to delete this token");
+        }
+        forgotPasswordRepo.delete(token);
+        }
 }
+
