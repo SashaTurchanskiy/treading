@@ -13,7 +13,7 @@ public class Coin {
 
     @Id
     @JsonProperty("id")
-    private Long id;
+    private String id;
     @JsonProperty("symbol")
     private String symbol;
     @JsonProperty("name")
