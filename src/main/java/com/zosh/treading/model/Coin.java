@@ -29,7 +29,7 @@ public class Coin {
     @JsonProperty("fully_diluted_valuation")
     private long fullyDilutedValuation;
     @JsonProperty("total_volume")
-    private long lVolume;
+    private long totalVolume;
     @JsonProperty("high_24h")
     private double high24h;
     @JsonProperty("low_24h")
@@ -44,7 +44,7 @@ public class Coin {
     private double marketCapChangePercentage24h;
     @JsonProperty("circulating_supply")
     private long circulatingSupply;
-    @JsonProperty("total_supply")
+    @JsonProperty("total_Supply")
     private long totalSupply;
     @JsonProperty("max_supply")
     private long maxSupply;

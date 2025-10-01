@@ -1,6 +1,7 @@
 package com.zosh.treading.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zosh.treading.model.Coin;
 import com.zosh.treading.repository.CoinRepo;
@@ -57,11 +58,36 @@ public class CoinServiceImpl implements CoinService{
     @Override
     public String getCoinDetails(String coinId) throws Exception {
         String url = "https://api.coingecko.com/api/v3/coins/"+coinId;
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate respTemplate = new RestTemplate();
         try {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response = restTemplat.exchange(url, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = respTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+
+            Coin coin = new Coin();
+            coin.setId(jsonNode.get("id").asText());
+            coin.setName(jsonNode.get("name").asText());
+            coin.setSymbol(jsonNode.get("symbol").asText());
+            coin.setImage(jsonNode.get("image").get("large").asText());
+
+            JsonNode marketData = jsonNode.get("market_data");
+
+            coin.setCurrentPrice(marketData.get("current_price").get("usd").asDouble());
+            coin.setMarketCap(marketData.get("market_cap").get("usd").asLong());
+            coin.setMarketCapRank(marketData.get("market_cap_rank").asInt());
+            coin.setTotalVolume(marketData.get("total_volume").get("usd").asLong());
+            coin.setHigh24h(marketData.get("high_24h").get("usd").asDouble());
+            coin.setLow24h(marketData.get("low_24h").get("usd").asDouble());
+            coin.setPriceChange24h(marketData.get("price_change_24h").asDouble());
+            coin.setPriceChangePercentage24h(marketData.get("price_change_percentage_24h").asDouble());
+
+            coin.setMarketCapChange24h(marketData.get("market_cap_change_24h").asLong());
+            coin.setMarketCapChangePercentage24h(marketData.get("market_cap_change_percentage_24h").asLong());
+            coin.setTotalSupply(marketData.get("total_supply").asLong());
+
+            coinRepo.save(coin);
             return response.getBody();
         }catch (HttpClientErrorException | HttpServerErrorException e){
             throw new Exception(e.getMessage());
@@ -69,22 +95,54 @@ public class CoinServiceImpl implements CoinService{
     }
 
     @Override
-    public Coin findById(Long id) {
-        return null;
+    public Coin findById(String coinId) throws Exception {
+        if (coinId == null){
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return coinRepo.findById(coinId).orElseThrow(
+                ()-> new Exception("Coin not found")
+        );
     }
 
     @Override
-    public String searchCoin(String keyword) {
-        return "";
+    public String searchCoin(String keyword) throws Exception {
+        String url = "https://api.coingecko.com/api/v3/search?query="+ keyword;
+        RestTemplate respTemplate = new RestTemplate();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = respTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            return response.getBody();
+        }catch (HttpClientErrorException | HttpServerErrorException e){
+            throw new Exception(e.getMessage());
+        }
     }
 
     @Override
-    public String getTop50CoinsByMarketCapRank() {
-        return "";
+    public String getTop50CoinsByMarketCapRank() throws Exception {
+        String url = "https://api.coingecko.com/api/v3/markets/vs_currency=usd&per_page=50&page=1";
+        RestTemplate respTemplate = new RestTemplate();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = respTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            return response.getBody();
+        }catch (HttpClientErrorException | HttpServerErrorException e){
+            throw new Exception(e.getMessage());
+        }
     }
 
     @Override
-    public String getTrendingCoins() {
-        return "";
+    public String getTrendingCoins() throws Exception {
+        String url = "https://api.coingecko.com/api/v3/coins/search/trending";
+        RestTemplate respTemplate = new RestTemplate();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = respTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            return response.getBody();
+        }catch (HttpClientErrorException | HttpServerErrorException e){
+            throw new Exception(e.getMessage());
+        }
     }
 }
