@@ -2,6 +2,7 @@ package com.zosh.treading.controller;
 
 import com.zosh.treading.model.Wallet;
 import com.zosh.treading.model.WalletTransaction;
+import com.zosh.treading.service.OrderService;
 import com.zosh.treading.service.UserService;
 import com.zosh.treading.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class WalletController {
 
     private final WalletService walletService;
     private final UserService userService;
+    private final OrderService orderService;
 
     @GetMapping("/get-wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
@@ -34,7 +36,7 @@ public class WalletController {
         var wallet = walletService.walletToWalletTransfer(senderUser, receiverWallet, req.getAmount());
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }
-    /*@PostMapping("/order/{orderId}/pay")
+    @PostMapping("/order/{orderId}/pay")
     public ResponseEntity<Wallet> payOrderPayment(
             @RequestHeader("Authorization") String jwt,
             @PathVariable Long orderId) throws Exception {
@@ -42,6 +44,6 @@ public class WalletController {
         var order = orderService.getOrderById(orderId);
         var wallet = walletService.payOrderPayment(order, user);
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
-    }*/
+    }
 
 }

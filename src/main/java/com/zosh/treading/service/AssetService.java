@@ -12,7 +12,7 @@ public interface AssetService {
     Asset getAssetById(Long assetId) throws Exception;
     Asset getAssetByUserIdAndId(Long userId, Long assetId);
     List<Asset> getUserAssets(Long userId);
-    Asset updateAssetQuantity(Long assetId, double quantity) throws Exception;
+    Asset updateAsset(Long assetId, double quantity) throws Exception;
     Asset findAssetByUserIdAndCoinId(Long userId, String coinId);
     void deleteAsset(Long assetId);
 
