@@ -7,6 +7,8 @@ import com.zosh.treading.repository.WatchlistRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class WatchlistServiceImpl implements WatchlistService{
@@ -31,12 +33,22 @@ public class WatchlistServiceImpl implements WatchlistService{
     }
 
     @Override
-    public Watchlist findById(Long id) {
-        return null;
+    public Watchlist findById(Long id) throws Exception {
+        Optional<Watchlist> watchlistOptional = watchlistRepo.findById(id);
+        if (watchlistOptional.isEmpty()){
+            throw new Exception("Watchlist not found with ID: " + id);
+        }
+        return watchlistOptional.get();
     }
 
     @Override
-    public Coin addItemToWatchlist(Coin coin, User user) {
-        return null;
+    public Coin addItemToWatchlist(Coin coin, User user) throws Exception {
+        Watchlist watchlist = findUserWatchlist(user.getId());
+        if (watchlist.getCoins().contains(coin)){
+            watchlist.getCoins().remove(coin);
+        }
+        else watchlist.getCoins().add(coin);
+        watchlistRepo.save(watchlist);
+        return coin;
     }
 }
